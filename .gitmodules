@@ -1,0 +1,9 @@
+[submodule "Lavender/vendor/spdlog"]
+	path = Lavender/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "Lavender/vendor/glfw"]
+	path = Lavender/vendor/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Lavender/vendor/imgui"]
+	path = Lavender/vendor/imgui
+	url = https://github.com/ocornut/imgui.git

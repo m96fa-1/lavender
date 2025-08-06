@@ -1,24 +1,23 @@
 #pragma once
+#include "core.h"
+#include "events/event.h"
 
-#include "Core.h"
-#include "Events/Event.h"
+namespace lv {
 
-namespace Lv {
-
-	class LV_API Layer {
+	class LV_API layer {
 	public:
-		Layer(const std::string& name = "Layer");
-		virtual ~Layer();
+		layer(const char* name = "Layer");
+		virtual ~layer();
 
-		virtual void OnAttach() {}
-		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
-		virtual void OnEvent(Event& e) {}
+		virtual void on_attach() {}
+		virtual void on_detach() {}
+		virtual void on_update() {}
+		virtual void on_event(event& event) {}
 		
-		inline const std::string& GetName() const { return m_debugName; }
+		inline const std::string& get_name() const { return m_debug_name; }
 
 	protected:
-		std::string m_debugName;
+		std::string m_debug_name;
 	};
 
 }

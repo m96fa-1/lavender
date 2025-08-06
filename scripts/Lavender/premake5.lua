@@ -1,50 +1,34 @@
-outputdir = "%{cfg.buildcfg}-%{cfg.architecture}-%{cfg.system}"
-workspc = "Lavender"
-prj1 = "Lavender"
-prj2 = "Sandbox"
-cppver = "C++20"
-cver = "C17"
-
--------------------------------------------------
---------------------Workspace--------------------
--------------------------------------------------
-workspace (workspc)
-    architecture "x86_64"
-    configurations { "Debug", "Release", "Dist" }
-    startproject (prj2)
-
-IncludeDir = {}
-IncludeDir["spdlog"] = (prj1 .. "/vendor/spdlog/include")
-IncludeDir["glfw"] = (prj1 .. "/vendor/glfw/include")
-IncludeDir["glad"] = (prj1 .. "/vendor/glad/include")
-IncludeDir["imgui"] = (prj1 .. "/vendor/imgui")
-
-include (prj1 .. "/vendor/glfw")
-include (prj1 .. "/vendor/glad")
-include (prj1 .. "/vendor/imgui")
-
--------------------------------------------------
---------------------Project 1--------------------
--------------------------------------------------
-project (prj1)
-    location (prj1)
+project "lavender"
     kind "SharedLib"
     language "C++"
+    cppdialect (cppver)
+    cdialect (cver)
+    staticruntime "Off"
+    systemversion "latest"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
 
     files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
+        "src/**.h",
+        "src/**.cpp",
+        "vendor/glm/glm/**.hpp",
+        "vendor/glm/glm/**.inl"
     }
 
     includedirs {
-        "%{prj.name}/src",
-        "%{IncludeDir.spdlog}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.imgui}",
+        "src",
+        "vendor/glfw/include",
+        "vendor/glad/include",
+        "vendor/glm",
+        "vendor/stb_image",
+        "vendor/imgui",
+        "vendor/spdlog/include",
+    }
+
+    defines {
+        "GLFW_INCLUDE_NONE",
+        "STB_IMAGE_IMPLEMENTATION"
     }
 
     links {
@@ -55,80 +39,38 @@ project (prj1)
     }
 
     pchheader "lvpch.h"
-    pchsource "%{prj.name}/src/lvpch.cpp"
+    pchsource "src/lvpch.cpp"
 
     filter "system:windows"
-        cppdialect (cppver)
-        cdialect (cver)
-        systemversion "latest"
-
         defines {
-            "LV_PLATFORM_WINDOWS",
-            "LV_BUILD_DLL",
-            "GLFW_INCLUDE_NONE",
+            "LV_WINDOWS",
+            "LV_BUILD_DLL"
         }
 
         postbuildcommands {
-            ("{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/" .. prj2 .. "/" .. prj1 .. ".dll")
+            ("IF NOT EXIST \"../bin/" .. outputdir .. "/sandbox/\" (mkdir \"../bin/" .. outputdir .. "/sandbox/\")"),
+            ("{COPYFILE} \"%{cfg.buildtarget.relpath}\" \"../bin/" .. outputdir .. "/sandbox/\"")
         }
 
-    filter "configurations:Debug"
-        defines {
-            "LV_DEBUG",
-            "LV_ENABLE_ASSERT",
-        }
-        symbols "On"
+    filter "system:macosx"
+        defines "LV_MACOSX"
 
-    filter "configurations:Release"
-        defines "LV_RELEASE"
-        optimize "On"
+    filter "system:linux"
+        defines "LV_LINUX"
 
-    filter "configurations:Dist"
-        defines "LV_DIST"
-        optimize "On"
-
--------------------------------------------------
---------------------Project 2--------------------
--------------------------------------------------
-project (prj2)
-    location (prj2)
-    kind "ConsoleApp"
-    language "C++"
-
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
-
-    includedirs {
-        (prj1 .. "/src"),
-        "%{IncludeDir.spdlog}"
-    }
-
-    links {
-        (prj1)
-    }
-
-    filter "system:windows"
-        cppdialect (cppver)
-        cdialect (cver)
-        systemversion "latest"
-
-        defines {
-            "LV_PLATFORM_WINDOWS"
-        }
-    
     filter "configurations:Debug"
         defines "LV_DEBUG"
+        runtime "Debug"
         symbols "On"
-
+        
     filter "configurations:Release"
         defines "LV_RELEASE"
+        runtime "Release"
         optimize "On"
-
+        symbols "On"
+        
     filter "configurations:Dist"
         defines "LV_DIST"
+        runtime "Release"
         optimize "On"
+        symbols "On"

@@ -1,41 +1,38 @@
 #pragma once
 
-#include "lvpch.h"
+#include "window.h"
+#include "layer_stack.h"
+#include "events.h"
 
-#include "Window.h"
-#include "LayerStack.h"
-#include "Events/WindowEvent.h"
-
-namespace Lv {
+namespace lv {
 	
-	class LV_API Application {
+	class LV_API application {
 	public:
-		Application();
-		virtual ~Application();
+		application();
+		virtual ~application();
 
-		void Run();
+		void run();
 
-		void OnEvent(Event& e);
+		void on_event(event& event);
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
+		void push_layer(layer* layer);
+		void push_overlay(layer* overlay);
 
-		inline static Application& Get() { return *s_instance; }
-		inline Window& GetWindow() { return *m_window; }
-
-	private:
-		bool OnWindowClose(WindowCloseEvent& e);
+		[[nodiscard]] inline static application& get() { return *s_instance; }
+		[[nodiscard]] inline window& get_window() { return *m_window; }
 
 	private:
-		bool m_running;
-		std::unique_ptr<Window> m_window;
-		LayerStack m_layerStack;
+		[[nodiscard]] bool on_window_close(window_close_event& event);
 
 	private:
-		static Application* s_instance;
+		bool m_is_running;
+		std::unique_ptr<window> m_window;
+		layer_stack m_layer_stack;
+
+		inline static application* s_instance = nullptr;
 	};
 
 	// Must be defined inside client applications
-	Application* CreateApplication();
+	application* create_application();
 
 }

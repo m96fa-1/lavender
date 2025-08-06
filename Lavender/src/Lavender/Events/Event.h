@@ -1,58 +1,57 @@
 #pragma once
+#include <print>
+#include <functional>
 
-#include "lvpch.h"
+namespace lv {
 
-namespace Lv {
-
-	enum class EventType {
-		None = 0,
-		WindowClose, WindowResize, WindowMove, WindowFocus, WindowFocusLose,
-		KeyDown, KeyUp,
-		MouseDown, MouseUp, MouseMove, MouseScroll
+	enum class event_type {
+		none = 0,
+		window_close, window_resize, window_move, window_focus, window_focus_lose,
+		key_down, key_up, key_repeat, key_type,
+		mouse_down, mouse_up, mouse_move, mouse_scroll
 	};
 
-	enum EventCategory {
-		None = 0,
-		WindowEventsCategory		= BIT(0),
-		InputEventsCategory			= BIT(1),
-		KeyboardEventsCategory		= BIT(2),
-		MouseEventsCategory			= BIT(3)
+	enum event_category {
+		none = 0,
+		window_events_category		= 1 << 0,
+		input_events_category		= 1 << 1,
+		keyboard_events_category	= 1 << 2,
+		mouse_events_category		= 1 << 3
 	};
 
-#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
-			   				   virtual EventType GetEventType() const override { return GetStaticType(); }\
-							   virtual const char* GetName() const override { return #type; }
+#define EVENT_CLASS_TYPE(type) static event_type get_static_type() noexcept { return event_type::##type; }\
+			   				   event_type get_event_type() const noexcept override { return get_static_type(); }\
+							   const char* get_name() const noexcept override { return #type; }
 
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
+#define EVENT_CLASS_CATEGORY(category) int get_category_flags() const noexcept override { return category; }
 
-	class LV_API Event {
-		friend class EventDispatcher;
+	class LV_API event {
+		friend class event_dispatcher;
+
 	public:
-		virtual EventType GetEventType() const = 0;
-		virtual const char* GetName() const = 0;
-		virtual int GetCategoryFlags() const = 0;
-		virtual std::string ToString() const { return GetName(); }
+		[[nodiscard]] virtual event_type get_event_type() const noexcept = 0;
+		[[nodiscard]] virtual const char* get_name() const noexcept = 0;
+		[[nodiscard]] virtual int get_category_flags() const noexcept = 0;
+		[[nodiscard]] virtual std::string to_string() const noexcept { return get_name(); }
 		
-		inline bool IsInCategory(EventCategory category) const {
-			return GetCategoryFlags() & category;
-		}
-		inline bool Handled() const { return m_handled; }
+		[[nodiscard]] inline bool is_in_category(event_category category) const noexcept { return get_category_flags() & category; }
+		[[nodiscard]] inline bool handled() const noexcept { return m_handled; }
 
 	protected:
 		bool m_handled;
 	};
 
-	class EventDispatcher {
+	class event_dispatcher {
 		template<typename T>
-		using EventFunc = std::function<bool(T&)>;
+		using event_func = std::function<bool(T&)>;
 		
 	public:
-		EventDispatcher(Event& event)
+		event_dispatcher(event& event)
 			: m_event(event) {}
 
 		template<typename T>
-		bool Dispatch(EventFunc<T> func) {
-			if (m_event.GetEventType() == T::GetStaticType()) {
+		bool dispatch(event_func<T> func) {
+			if (m_event.get_event_type() == T::get_static_type()) {
 				m_event.m_handled = func(*(T*)&m_event);
 				return true;
 			}
@@ -60,11 +59,7 @@ namespace Lv {
 		}
 
 	private:
-		Event& m_event;
+		event& m_event;
 	};
-
-	inline std::ostream& operator<<(std::ostream& os, const Event& e) {
-		return os << e.ToString();
-	}
 
 }

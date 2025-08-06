@@ -1,38 +1,41 @@
 #pragma once
 
-#include "Lavender/Core.h"
-#include "Lavender/Events/Event.h"
+#include "lavender/core.h"
+#include "lavender/events/event.h"
 
-namespace Lv {
+namespace lv {
 
-	struct WindowProps {
-		unsigned int width;
-		unsigned int height;
+	struct window_props {
+		int width, height;
 		std::string title;
+		bool vsync;
+		bool center_window;
 
-		WindowProps(
-			unsigned int width = 1280U,
-			unsigned int height = 720U,
-			const std::string& title = "Lavender Engine")
-			: width(width), height(height), title(title) {}
+		window_props(int width = 1280, int height = 720, const char* title = "Lavender Engine", bool vsync = true, bool center_window = true)
+			: width(width), height(height), title(title), center_window(center_window) {
+			
+		}
 	};
 
-	class LV_API Window {
+	class LV_API window {
 	public:
-		using EventCallbackFunc = std::function<void(Event&)>;
+		using event_callback_func = std::function<void(event&)>;
 
-		virtual ~Window() {}
-
-		virtual void OnUpdate() = 0;
-
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
-		virtual bool IsVsync() const = 0;
+		virtual ~window() {
 		
-		virtual void SetEventCallback(const EventCallbackFunc& callback) = 0;
-		virtual void SetVsync(bool enabled) = 0;
+		}
 
-		static Window* Create(const WindowProps& props = WindowProps());
+		virtual void on_update() = 0;
+
+		[[nodiscard]] virtual inline int get_width() const noexcept = 0;
+		[[nodiscard]] virtual inline int get_height() const noexcept = 0;
+		[[nodiscard]] virtual inline bool is_vsync() const noexcept = 0;
+		
+		virtual void set_event_callback(const event_callback_func& callback) = 0;
+
+		virtual void* get_native_window() const = 0;
+
+		static window* create(const window_props& props = window_props());
 	};
 
 }

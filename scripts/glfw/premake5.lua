@@ -1,6 +1,8 @@
 project "glfw"
     kind "StaticLib"
     language "C"
+    staticruntime "On"
+    systemversion "latest"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -29,9 +31,6 @@ project "glfw"
     }
 
     filter "system:windows"
-        staticruntime "On"
-        systemversion "latest"
-
         files {
             "src/win32_time.h",
             "src/win32_time.c",
@@ -55,5 +54,5 @@ project "glfw"
         }
 
         links {
-            "gdi32"
+            "Dwmapi.lib"
         }

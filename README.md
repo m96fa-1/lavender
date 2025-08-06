@@ -10,5 +10,3 @@ git clone --recursive https://github.com/m96fa-1/Lavender.git
 ```
 2. Open the `scripts` folder and run the `SetupProjects.bat` file and the Visual Studio solution and projects will be automatically generated.
 3. Open the solution in the cloned directory and hit `F5` on keyboard to run The Windows Debugger.
-> [!WARNING]
-> It probably won't work at the first time you run it for some reason, if that happens, just run the debugger again and it will run.

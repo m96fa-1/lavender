@@ -1,12 +1,12 @@
 #include "lvpch.h"
-#include "Layer.h"
+#include "layer.h"
 
-namespace Lv {
+namespace lv {
 
-	Layer::Layer(const std::string& name /*= "Layer"*/)
-		: m_debugName(name) {}
+	layer::layer(const char* name /*= "Layer"*/)
+		: m_debug_name(name) {}
 
-	Layer::~Layer() {
+	layer::~layer() {
 		
 	}
 

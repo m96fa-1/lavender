@@ -1,11 +1,19 @@
 #pragma once
 
-#include "Lavender/Application.h"
-#include "Lavender/Layer.h"
-#include "Lavender/Log.h"
+// To be used by Lavender applications
 
-#include "Lavender/ImGui/ImGuiLayer.h"
+#include "lavender/application.h"
+#include "lavender/logger.h"
+#include "lavender/events.h"
+#include "lavender/layer.h"
 
-// --------Entry Point--------
-#include "Lavender/EntryPoint.h"
-// ---------------------------
+#include "lavender/input.h"
+#include "lavender/key_codes.h"
+
+#ifdef LV_WINDOWS
+#include "platform/imgui/glfw_opengl_imgui_layer.h"
+#endif
+
+// -------Main Entry Point-------
+#include "lavender/entry_point.h"
+// ------------------------------

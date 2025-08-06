@@ -1,24 +1,42 @@
 #pragma once
 
-#ifdef LV_PLATFORM_WINDOWS
+#if defined(LV_WINDOWS)
 	#ifdef LV_BUILD_DLL
 		#define LV_API __declspec(dllexport)
 	#else
 		#define LV_API __declspec(dllimport)
 	#endif
+
+#elif defined(LV_MACOSX)
+	#ifdef LV_BUILD_DLL
+		#define LV_API 
+	#else
+		#define LV_API 
+	#endif
+
+#elif defined(LV_LINUX)
+	#ifdef LV_BUILD_DLL
+		#define LV_API __attribute__((visibility("default")))
+	#else
+		#define LV_API 
+	#endif
+
 #else
-	#error Lavender only supports Windows for now.
+	#error What on earth is the platform you are using?
 #endif
 
-#include "Log.h"
+#ifndef LV_DIST
+	#define LV_ENABLE_ASSERT
+	#define LV_ENABLE_LOGGING
+#endif
 
 #ifdef LV_ENABLE_ASSERT
-	#define LV_CORE_ASSERT(x, ...) { if(!(x)) { LV_CORE_ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	#define LV_ASSERT(x, ...) { if(!(x)) { LV_ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define LV_CORE_ASSERT(x, ...) if(!(x)) { LV_CORE_ERROR("Assertion failed: {0}", __VA_ARGS__); }
+	#define LV_ASSERT(x, ...) if(!(x)) { LV_LOG_ERROR("Assertion failed: {0}", __VA_ARGS__); }
+
 #else
-	// Set them as nothing (will be ignored/deleted by the compiler)
 	#define LV_CORE_ASSERT(x, ...)
 	#define LV_ASSERT(x, ...)
 #endif
 
-#define BIT(x) (1 << x)
+#define LV_BIND_EVENT_FUNC(func) std::bind(&func, this, std::placeholders::_1)
